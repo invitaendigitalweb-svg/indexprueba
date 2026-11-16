@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nuestra Invitación</title>
+
+  <!-- METATAGS PARA MINIATURA DE WHATSAPP -->
+  <meta property="og:title" content="Nuestra Invitación">
+  <meta property="og:description" content="¡Estás invitado a nuestra boda! Haz click para ver los detalles.">
+  <meta property="og:image" content="miniatura.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- html2canvas para descargar pases -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: #F9F8F5;
+      font-family: 'Cinzel', serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* MARCO DE CELULAR CON PARALLAX */
+    .mobile-screen {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      height: 100dvh;
+      position: relative;
+      background-color: #F9F8F5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    /* PSEUDOELEMENTO CON MÁS ANCHO Y FONDO JPG */
+    .mobile-screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -15%; /* Centra la imagen al estar ampliada */
+      width: 130%; /* Amplía la imagen para que las ramas entren más a los lados */
+      height: 160%; /* Altura para dar espacio al movimiento vertical */
+      background-image: url('fondo.jpg');
+      background-size: cover;
+      background-position: top center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      pointer-events: none;
+      transform: translateY(var(--bg-y, 0%));
+      transition: transform 0.15s ease-out;
+      will-change: transform;
+    }
+
+    /* SCROLL INTERIOR TRANSPARENTE SOBRE EL FONDO */
+    .invitation-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 1; /* Queda sobre el fondo */
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      background: transparent;
+      
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      padding-bottom: 50px;
+    }
+
+    .invitation-wrapper.open-portada {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .invitation-wrapper::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    /* BOTÓN FLOTANTE DE MÚSICA */
+    .music-btn {
+      position: absolute;
+      bottom: 25px;
+      right: 20px;
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #A68B5B 0%, #8C6D46 100%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(140, 109, 70, 0.4);
+      cursor: pointer;
+      z-index: 9;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, transform 0.2s ease, visibility 0.5s ease;
+    }
+
+    .music-btn.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .music-btn:active {
+      transform: scale(0.9);
+    }
+
+    .music-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
+    }
+
+    .music-btn.playing svg {
+      animation: pulseMusic 2s infinite linear;
+    }
+
+    @keyframes pulseMusic {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    /* SECCIONES DE IMÁGENES */
+    .image-section {
+      width: 100%;
+      background-color: transparent;
+      display: block;
+      margin: 0;
+      padding: 0;
+      line-height: 0;
+      position: relative;
+    }
+
+    .image-section img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0;
+      padding: 0;
+      filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.03));
+    }
+
+    /* ANIMACIONES DE TRANSICIÓN MEJORADAS */
+    .portada-section img {
+      opacity: 0;
+      transform: scale(1.4);
+      transition: opacity 2.5s cubic-bezier(0.16, 1, 0.3, 1) 1.4s, transform 2.5s cubic-bezier(0.16, 1, 0.3, 1) 1.4s;
+      will-change: opacity, transform;
+    }
+    
+    .portada-section.portada-animada img {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .papas-section img {
+      opacity: 0;
+      transform: translateY(-60px);
+      transition: opacity 2.2s cubic-bezier(0.22, 1, 0.36, 1) 1.6s, transform 2.2s cubic-bezier(0.22, 1, 0.36, 1) 1.6s;
+      will-change: opacity, transform;
+    }
+    
+    .papas-section.papas-animada img {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fecha-animada {
+      opacity: 0;
+      filter: blur(4px);
+      transform: translateY(20px);
+      transition: opacity 1.4s ease-out, filter 1.4s ease-out, transform 1.4s ease-out;
+      will-change: opacity, filter, transform;
+    }
+    .fecha-animada.visible-section {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    .slide-left {
+      opacity: 0;
+      transform: translateX(-35px);
+      transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: opacity, transform;
+    }
+    .slide-left.visible-section {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .slide-right {
+      opacity: 0;
+      transform: translateX(35px);
+      transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: opacity, transform;
+    }
+    .slide-right.visible-section {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .scale-up {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 1s cubic-bezier(0.34, 1.56, 0.64, 1), transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      will-change: opacity, transform;
+    }
+    .scale-up.visible-section {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(25px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      will-change: opacity, transform;
+    }
+    .fade-up.visible-section {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* CUENTA REGRESIVA */
+    .countdown-section {
+      background-color: transparent;
+      padding: 35px 15px 45px 15px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .countdown-flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .countdown-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 65px;
+    }
+
+    .countdown-number {
+      font-size: 42px;
+      font-weight: 500;
+      color: #1A1A1A;
+      font-family: 'Cormorant Garamond', serif;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .countdown-label {
+      font-size: 15px;
+      color: #8C6D46;
+      font-weight: 600;
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      text-transform: none;
+    }
+
+    .countdown-divider {
+      font-size: 18px;
+      color: #A68B5B;
+      margin-top: -20px;
+      user-select: none;
+    }
+
+    /* BOTONES */
+    .btn-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 15px 0 25px 0;
+      background-color: transparent;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #A68B5B 0%, #8C6D46 100%);
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 12px 26px;
+      border-radius: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 12px rgba(140, 109, 70, 0.4);
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      line-height: normal;
+      cursor: pointer;
+    }
+
+    .btn-action:active {
+      transform: scale(0.95);
+    }
+
+    .btn-action svg {
+      width: 15px;
+      height: 15px;
+      fill: #ffffff;
+    }
+
+    /* MODAL DRESS CODE */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 99;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 85%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: scale(0.85);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 36px;
+      height: 36px;
+      background: #8C6D46;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 100;
+    }
+
+    /* ITINERARIO */
+    .itinerario-container {
+      width: 100%;
+      padding: 40px 20px;
+      background-color: transparent;
+      transform: translateZ(0);
+    }
+
+    .itinerario-wrapper {
+      max-width: 360px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .itinerario {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+    }
+
+    .itinerario::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      bottom: 15px;
+      left: 75px;
+      width: 2px;
+      background: linear-gradient(180deg, #A68B5B 0%, #8C6D46 100%);
+      z-index: 1;
+    }
+
+    .evento {
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .lado-izq {
+      width: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .lado-izq .icono {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid #A68B5B;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(140, 109, 70, 0.15);
+      padding: 8px;
+    }
+
+    .lado-izq .icono img,
+    .lado-izq .icono svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .punto {
+      width: 12px;
+      height: 12px;
+      background-color: #8C6D46;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      margin: 0 10px;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 2px #A68B5B;
+    }
+
+    .lado-der {
+      padding-left: 10px;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .lado-der .hora {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #8C6D46;
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+    }
+
+    .lado-der .titulo-evento {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-top: 3px;
+      display: block;
+      letter-spacing: 0.5px;
+    }
+
+    .lado-der .momento {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 500;
+      font-style: italic;
+      color: #4A4A4A;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    /* SOBRE DE BIENVENIDA */
+    .envelope-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      cursor: pointer;
+      perspective: 1200px;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #F9F8F5;
+    }
+
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('sobre.jpg');
+      background-size: cover;
+      background-position: center;
+      backface-visibility: hidden;
+      transition: transform 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .envelope-flap-top {
+      clip-path: polygon(0 0, 100% 0, 50% 50%);
+      transform-origin: top;
+      z-index: 5;
+    }
+
+    .envelope-flap-bottom {
+      clip-path: polygon(0 100%, 100% 100%, 50% 50%);
+      transform-origin: bottom;
+      z-index: 3;
+    }
+
+    .envelope-flap-left {
+      clip-path: polygon(0 0, 0 100%, 50% 50%);
+      transform-origin: left;
+      z-index: 2;
+    }
+
+    .envelope-flap-right {
+      clip-path: polygon(100% 0, 100% 100%, 50% 50%);
+      transform-origin: right;
+      z-index: 2;
+    }
+
+    .open .envelope-flap-top { transform: rotateX(180deg); }
+    .open .envelope-flap-bottom { transform: rotateX(-180deg); }
+    .open .envelope-flap-left { transform: rotateY(-180deg); }
+    .open .envelope-flap-right { transform: rotateY(180deg); }
+
+    .open.envelope-container {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 1.2s ease 1s, visibility 1.2s ease 1s;
+    }
+
+    /* FORMULARIO RSVP DE INDEX5 */
+    .rsvp-container {
+      width: 100%;
+      padding: 10px 20px 40px 20px;
+      background: transparent;
+      font-family: 'Montserrat', sans-serif;
+      color: #5a2525;
+    }
+
+    .rsvp-tarjeta {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #c9a24e;
+      border-radius: 25px;
+      padding: 35px 28px;
+      box-shadow: 0 15px 45px rgba(90, 37, 37, .15);
+    }
+
+    .selector-cantidad {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .selector-cantidad label {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      color: #c9a24e;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #d8c0ad;
+      background: #ffffff;
+      outline: none;
+      font-family: 'Montserrat', sans-serif;
+      color: #5a2525;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    select:focus {
+      border-color: #c9a24e;
+      box-shadow: 0 0 6px rgba(201, 162, 78, 0.3);
+    }
+
+    .tarjeta-integrante {
+      background: #fffaf5;
+      border: 1px solid #d8c0ad;
+      border-radius: 15px;
+      padding: 16px;
+      margin-bottom: 15px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tarjeta-integrante .titulo-integrante {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: #c9a24e;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .rsvp-container input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #d8c0ad;
+      background: #ffffff;
+      outline: none;
+      font-family: 'Montserrat', sans-serif;
+      color: #5a2525;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .rsvp-container input[type="text"]:focus {
+      border-color: #c9a24e;
+      box-shadow: 0 0 6px rgba(201, 162, 78, 0.3);
+    }
+
+    .opciones { display: flex; gap: 10px; }
+    .opcion { flex: 1; }
+    .opcion input { display: none; }
+    .opcion label {
+      display: block;
+      text-align: center;
+      padding: 10px 5px;
+      border: 1px solid #d8c0ad;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      background: #ffffff;
+      transition: .2s;
+    }
+
+    .opcion input:checked + label {
+      background: #6f4e37;
+      border-color: #6f4e37;
+      color: #ffffff;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .boton-rsvp {
+      width: 100%;
+      border: 0;
+      border-radius: 30px;
+      padding: 16px;
+      background: #6f4e37;
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 4px 12px rgba(111, 78, 55, 0.25);
+      outline: none;
+    }
+
+    .boton-rsvp:hover { background: #5c3d2e; }
+    .boton-rsvp:disabled { opacity: .6; cursor: not-allowed; }
+
+    .mensaje-rsvp {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #fff7f2;
+      border: 1px solid #d9bda8;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    .mensaje-rsvp.visible { display: block; }
+
+    .lista-pases { display: none; margin-top: 25px; }
+    .lista-pases.visible { display: block; }
+
+    .tarjeta-pase-individual { margin-bottom: 30px; }
+
+    .contenido-pase {
+      position: relative;
+      width: 100%;
+      padding: 35px 20px 25px;
+      text-align: center;
+      border: 2px solid #c9a24e;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #fffdf9 0%, #faf0e8 50%, #f3e3da 100%);
+      box-shadow: 0 10px 30px rgba(128, 72, 89, .12);
+    }
+
+    .pase-adorno { font-size: 20px; color: #c9a24e; margin-bottom: 5px; }
+
+    .pase-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      color: #c9a24e;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+
+    .pase-linea { width: 80px; height: 1px; background: #c9a24e; margin: 0 auto 20px; }
+
+    .pase-nombre {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: #5a2525;
+      margin: 10px 0 5px;
+    }
+
+    .pase-indicador {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 16px;
+      background: #6f4e37;
+      color: #ffffff;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .pase-intransferible {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px dashed #d8c0ad;
+      font-size: 11px;
+      color: #8c5d5d;
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    .boton-descargar {
+      width: 100%;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 20px;
+      margin-top: 12px;
+      background: #6f4e37;
+      color: #fffaf2;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .boton-descargar:hover { background: #5c3d2e; }
+  </style>
+</head>
+
+<body>
+
+<div class="mobile-screen" id="mobileScreen">
+
+    <audio id="bg-music" src="cancion.mp3" loop preload="auto"></audio>
+
+    <!-- BOTÓN REPRODUCTOR DE MÚSICA -->
+    <button class="music-btn" id="musicBtn" onclick="toggleMusic()" aria-label="Controlar música">
+        <svg id="musicIcon" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+    </button>
+
+    <!-- MODAL EMERGENTE DRESS CODE -->
+    <div class="modal-overlay" id="dressCodeModal" onclick="closeDressCode()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeDressCode()">&times;</button>
+            <img src="dresscode.jpg" alt="Dress Code">
+        </div>
+    </div>
+
+    <div class="invitation-wrapper" id="invitation">
+
+        <!-- 1. PORTADA -->
+        <div class="image-section portada-section" id="portadaSection">
+            <img src="portada.png" alt="Portada">
+        </div>
+
+        <!-- 2. PAPÁS -->
+        <div class="image-section papas-section" id="papasSection">
+            <img src="papas.png" alt="Nuestros Padres">
+        </div>
+
+        <!-- 3. FECHA -->
+        <div class="image-section fecha-animada reveal-section">
+            <img src="fecha.png" alt="Fecha">
+        </div>
+
+        <!-- 4. CONTADOR -->
+        <div class="countdown-section fade-up reveal-section">
+            <div class="countdown-flex">
+                <div class="countdown-item">
+                    <span id="days" class="countdown-number">00</span>
+                    <span class="countdown-label">Días</span>
+                </div>
+                <div class="countdown-divider">•</div>
+                <div class="countdown-item">
+                    <span id="hours" class="countdown-number">00</span>
+                    <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-divider">•</div>
+                <div class="countdown-item">
+                    <span id="minutes" class="countdown-number">00</span>
+                    <span class="countdown-label">Minutos</span>
+                </div>
+                <div class="countdown-divider">•</div>
+                <div class="countdown-item">
+                    <span id="seconds" class="countdown-number">00</span>
+                    <span class="countdown-label">Segundos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. CEREMONIA -->
+        <div class="image-section scale-up reveal-section">
+            <img src="ceremonia.png" alt="Ceremonia">
+        </div>
+        <div class="btn-container fade-up reveal-section">
+            <a href="https://www.google.com/maps/place/Parroquia+de+San+Jos%C3%A9+Obrero/@25.7302761,-100.2988696,756m/data=!3m2!1e3!4b1!4m6!3m5!1s0x866294fb9efa91dd:0x5826efabe5d608e0!8m2!3d25.7302761!4d-100.2962947!16s%2Fg%2F1tdx93px?entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="btn-action">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5-2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Ver ubicación
+            </a>
+        </div>
+
+        <!-- 6. RECEPCIÓN -->
+        <div class="image-section scale-up reveal-section">
+            <img src="recepcion.png" alt="Recepción">
+        </div>
+        <div class="btn-container fade-up reveal-section">
+            <a href="https://www.google.com/maps/place/Windsor+Eventos/@25.7488889,-100.301186,755m/data=!3m2!1e3!4b1!4m6!3m5!1s0x8662948c82a06e15:0xbd39c2f1f1f88a2d!8m2!3d25.7488889!4d-100.2986111!16s%2Fg%2F1ts_70mp?entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="btn-action">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5-2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Ver ubicación
+            </a>
+        </div>
+
+        <!-- 7. VESTIMENTA -->
+        <div class="image-section slide-left reveal-section">
+            <img src="vestimenta.png" alt="Vestimenta">
+        </div>
+        <div class="btn-container fade-up reveal-section">
+            <button class="btn-action" onclick="openDressCode()">
+                Ver dress code
+            </button>
+        </div>
+
+        <!-- 8. FOTO DE ITINERARIO (PNG) -->
+        <div class="image-section fade-up reveal-section">
+            <img src="itinerario.png" alt="Itinerario Header">
+        </div>
+
+        <!-- 9. ITINERARIO DINÁMICO HTML -->
+        <div class="itinerario-container">
+            <div class="itinerario-wrapper">
+                <div class="itinerario">
+
+                    <div class="evento fade-up reveal-section">
+                        <div class="lado-izq">
+                            <div class="icono">
+                                <svg viewBox="0 0 24 24" fill="#8C6D46">
+                                    <path d="M11 2h2v3h3v2h-3v3h-2V7H8V5h3V2zm-2 9h6l5 3v8H4v-8l5-3zm3 2a2 2 0 0 0-2 2v5h4v-5a2 2 0 0 0-2-2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="punto"></div>
+                        <div class="lado-der">
+                            <span class="hora">4:00 p. m.</span>
+                            <strong class="titulo-evento">Ceremonia religiosa</strong>
+                            <span class="momento">Comenzamos nuestro camino<br>Con la bendición de Dios.</span>
+                        </div>
+                    </div>
+
+                    <div class="evento fade-up reveal-section">
+                        <div class="lado-izq">
+                            <div class="icono">
+                                <img src="https://i.imgur.com/5iX5qn7.png" alt="Recepción">
+                            </div>
+                        </div>
+                        <div class="punto"></div>
+                        <div class="lado-der">
+                            <span class="hora">8:00 p. m.</span>
+                            <strong class="titulo-evento">Recepción</strong>
+                            <span class="momento">Bienvenidos a una noche muy especial.</span>
+                        </div>
+                    </div>
+
+                    <div class="evento fade-up reveal-section">
+                        <div class="lado-izq">
+                            <div class="icono">
+                                <img src="https://i.imgur.com/msRYgoq.png" alt="Entrada de novios">
+                            </div>
+                        </div>
+                        <div class="punto"></div>
+                        <div class="lado-der">
+                            <span class="hora">8:30 p. m.</span>
+                            <strong class="titulo-evento">Entrada de novios</strong>
+                            <span class="momento">Y ahora sí… ¡a celebrar!</span>
+                        </div>
+                    </div>
+
+                    <div class="evento fade-up reveal-section">
+                        <div class="lado-izq">
+                            <div class="icono">
+                                <img src="https://i.imgur.com/BzUQM62.png" alt="Cena">
+                            </div>
+                        </div>
+                        <div class="punto"></div>
+                        <div class="lado-der">
+                            <span class="hora">9:00 p. m.</span>
+                            <strong class="titulo-evento">Cena</strong>
+                            <span class="momento">Un momento para compartir y disfrutar.</span>
+                        </div>
+                    </div>
+
+                    <div class="evento fade-up reveal-section">
+                        <div class="lado-izq">
+                            <div class="icono">
+                                <img src="https://i.imgur.com/qb2QFsO.png" alt="A bailar">
+                            </div>
+                        </div>
+                        <div class="punto"></div>
+                        <div class="lado-der">
+                            <span class="hora">10:00 p. m.</span>
+                            <strong class="titulo-evento">¡A bailar!</strong>
+                            <span class="momento">Que comience la fiesta.</span>
+                        </div>
+                    </div>
+
+                    <div class="evento fade-up reveal-section">
+                        <div class="lado-izq">
+                            <div class="icono">
+                                <img src="https://i.imgur.com/06wV2Qn.png" alt="Fin de la celebración">
+                            </div>
+                        </div>
+                        <div class="punto"></div>
+                        <div class="lado-der">
+                            <span class="hora">1:00 a. m.</span>
+                            <strong class="titulo-evento">Fin de la celebración</strong>
+                            <span class="momento">Gracias por ser parte de nuestra historia.</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. MESA DE REGALOS -->
+        <div class="image-section scale-up reveal-section">
+            <img src="regalo.png" alt="Mesa de Regalos">
+        </div>
+
+        <!-- 11. NO NIÑOS -->
+        <div class="image-section slide-right reveal-section">
+            <img src="ninos.png" alt="Evento de Adultos">
+        </div>
+
+        <!-- 12. IMAGEN DE ASISTENCIA -->
+        <div class="image-section scale-up reveal-section">
+            <img src="asistencia.png" alt="Confirmación de Asistencia">
+        </div>
+
+        <!-- 13. FORMULARIO RSVP DE INDEX5 -->
+        <div class="rsvp-container fade-up reveal-section">
+            <div class="rsvp-tarjeta">
+                <div id="formularioCampos">
+                    <!-- Selector de cantidad de personas (1 a 5) -->
+                    <div class="selector-cantidad">
+                        <label for="selectCantidad">¿Cuántos asistentes confirmarán?</label>
+                        <select id="selectCantidad" onchange="generarCampos(this.value)">
+                            <option value="1" selected>1 Persona</option>
+                            <option value="2">2 Personas</option>
+                            <option value="3">3 Personas</option>
+                            <option value="4">4 Personas</option>
+                            <option value="5">5 Personas</option>
+                        </select>
+                    </div>
+
+                    <div id="contenedorIntegrantes"></div>
+                    <button class="boton-rsvp" id="botonEnviar" onclick="enviarRegistro()">Confirmar respuestas</button>
+                </div>
+
+                <div id="mensaje" class="mensaje-rsvp"></div>
+                <div id="listaPases" class="lista-pases"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SOBRE DE BIENVENIDA -->
+    <div class="envelope-container" id="envelope">
+        <div class="flap envelope-flap-top"></div>
+        <div class="flap envelope-flap-bottom"></div>
+        <div class="flap envelope-flap-left"></div>
+        <div class="flap envelope-flap-right"></div>
+    </div>
+
+</div>
+
+<script>
+    let isOpen = false;
+    const music = document.getElementById("bg-music");
+    const wrapper = document.getElementById("invitation");
+    const envelope = document.getElementById("envelope");
+    const musicBtn = document.getElementById("musicBtn");
+    const musicIcon = document.getElementById("musicIcon");
+    const portadaSection = document.getElementById("portadaSection");
+    const papasSection = document.getElementById("papasSection");
+    const dressCodeModal = document.getElementById("dressCodeModal");
+    const mobileScreen = document.getElementById("mobileScreen");
+
+    const notePath = '<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>';
+    const pausePath = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+    /* MOVIMIENTO PARALLAX */
+    let ticking = false;
+    wrapper.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const scrollTop = wrapper.scrollTop;
+                const maxScroll = wrapper.scrollHeight - wrapper.clientHeight;
+                if (maxScroll > 0) {
+                    const percentage = scrollTop / maxScroll;
+                    const translateY = percentage * -30; 
+                    mobileScreen.style.setProperty('--bg-y', `${translateY}%`);
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    function openDressCode() {
+        if (dressCodeModal) {
+            dressCodeModal.classList.add("active");
+        }
+    }
+
+    function closeDressCode() {
+        if (dressCodeModal) {
+            dressCodeModal.classList.remove("active");
+        }
+    }
+
+    function openEnvelope() {
+        if (!isOpen) {
+            isOpen = true;
+            wrapper.scrollTop = 0;
+            
+            envelope.classList.add("open");
+            wrapper.classList.add("open-portada");
+            musicBtn.classList.add("visible");
+            
+            void portadaSection.offsetWidth;
+            
+            requestAnimationFrame(() => {
+                portadaSection.classList.add("portada-animada");
+                papasSection.classList.add("papas-animada");
+            });
+
+            initScrollAnimations();
+
+            if (music) {
+                var playPromise = music.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(function() {
+                        musicBtn.classList.add("playing");
+                        musicIcon.innerHTML = notePath;
+                    }).catch(function(error) {
+                        console.log("Audio en reproducción manual:", error);
+                        musicBtn.classList.remove("playing");
+                        musicIcon.innerHTML = pausePath;
+                    });
+                }
+            }
+        }
+    }
+
+    envelope.addEventListener('click', openEnvelope);
+    envelope.addEventListener('touchstart', openEnvelope, { passive: true });
+
+    function toggleMusic() {
+        if (music.paused) {
+            music.play();
+            musicBtn.classList.add("playing");
+            musicIcon.innerHTML = notePath;
+        } else {
+            music.pause();
+            musicBtn.classList.remove("playing");
+            musicIcon.innerHTML = pausePath;
+        }
+    }
+
+    function initScrollAnimations() {
+        const revealElements = document.querySelectorAll('.reveal-section');
+        
+        const observerOptions = {
+            root: wrapper,
+            rootMargin: '0px 0px -30px 0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible-section');
+                }
+            });
+        }, observerOptions);
+
+        revealElements.forEach(el => observer.observe(el));
+    }
+
+    function updateCountdown() {
+        const targetDate = new Date("November 14, 2026 16:00:00").getTime();
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+            document.getElementById('days').innerText = "00";
+            document.getElementById('hours').innerText = "00";
+            document.getElementById('minutes').innerText = "00";
+            document.getElementById('seconds').innerText = "00";
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('days').innerText = String(days).padStart(2, '0');
+        document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    /* LÓGICA DE RSVP (INDEX5) */
+    const API_URL = "https://script.google.com/macros/s/AKfycbx1n9R66RAjT6DhaLGeU7JN_3U410afmuGSGwVSQeVg0RORoZP0MtsIyCEXX_ujongXzg/exec";
+    let cantidadSeleccionada = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pasesParam = parseInt(urlParams.get('pases'));
+
+      if (!isNaN(pasesParam) && pasesParam >= 1 && pasesParam <= 5) {
+        cantidadSeleccionada = pasesParam;
+      }
+
+      const selector = document.getElementById('selectCantidad');
+      if (selector) selector.value = cantidadSeleccionada;
+
+      generarCampos(cantidadSeleccionada);
+    });
+
+    // Genera los campos dinámicamente de 1 a 5 asistentes
+    function generarCampos(cantidad) {
+      cantidadSeleccionada = parseInt(cantidad);
+      const contenedor = document.getElementById('contenedorIntegrantes');
+      if (!contenedor) return;
+      
+      contenedor.innerHTML = '';
+
+      for (let i = 1; i <= cantidadSeleccionada; i++) {
+        const div = document.createElement('div');
+        div.className = 'tarjeta-integrante';
+        div.innerHTML = `
+          <div class="titulo-integrante">${cantidadSeleccionada === 1 ? 'Asistente' : `Asistente ${i}`}</div>
+          <input type="text" id="nombre_${i}" placeholder="Nombre(s)" autocomplete="off">
+          <input type="text" id="apellidoPaterno_${i}" placeholder="Primer Apellido" autocomplete="off">
+          <input type="text" id="apellidoMaterno_${i}" placeholder="Segundo Apellido" autocomplete="off">
+          <div class="opciones">
+            <div class="opcion">
+              <input type="radio" name="asist_${i}" id="si_${i}" value="Sí" checked>
+              <label for="si_${i}">Sí asistiré</label>
+            </div>
+            <div class="opcion">
+              <input type="radio" name="asist_${i}" id="no_${i}" value="No">
+              <label for="no_${i}">No asistiré</label>
+            </div>
+          </div>
+        `;
+        contenedor.appendChild(div);
+      }
+    }
+
+    function llamarAPI(parametros) {
+      return new Promise((resolve, reject) => {
+        const callback = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
+        const script = document.createElement('script');
+        const query = new URLSearchParams({ ...parametros, callback });
+        const tiempo = setTimeout(() => { limpiar(); reject("Tiempo agotado"); }, 12000);
+
+        window[callback] = function(data) {
+          clearTimeout(tiempo);
+          limpiar();
+          resolve(data);
+        };
+
+        function limpiar() {
+          delete window[callback];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        script.onerror = function() {
+          clearTimeout(tiempo);
+          limpiar();
+          reject("Error de conexión");
+        };
+
+        script.src = API_URL + '?' + query.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    async function enviarRegistro() {
+      const mensaje = document.getElementById('mensaje');
+      const listaPases = document.getElementById('listaPases');
+      const boton = document.getElementById('botonEnviar');
+
+      const listaPersonas = [];
+
+      for (let i = 1; i <= cantidadSeleccionada; i++) {
+        const nombreVal = document.getElementById(`nombre_${i}`).value.trim();
+        const apPaternoVal = document.getElementById(`apellidoPaterno_${i}`).value.trim();
+        const apMaternoVal = document.getElementById(`apellidoMaterno_${i}`).value.trim();
+        const asistVal = document.querySelector(`input[name="asist_${i}"]:checked`).value;
+
+        if (!nombreVal || !apPaternoVal || !apMaternoVal) {
+          mostrarMensaje(`Por favor completa el Nombre, Primer Apellido y Segundo Apellido ${cantidadSeleccionada > 1 ? `del Asistente ${i}` : ''}.`);
+          return;
+        }
+
+        const nombreCompleto = `${nombreVal} ${apPaternoVal} ${apMaternoVal}`;
+
+        listaPersonas.push({
+          nombre: nombreCompleto,
+          asistencia: asistVal
+        });
+      }
+
+      boton.disabled = true;
+      boton.textContent = 'Enviando...';
+
+      try {
+        await llamarAPI({
+          action: 'registrarIndividuales',
+          personas: JSON.stringify(listaPersonas)
+        });
+
+        document.getElementById('formularioCampos').style.display = 'none';
+
+        const confirmados = listaPersonas.filter(p => p.asistencia === 'Sí');
+
+        if (confirmados.length === 0) {
+          mostrarMensaje('Muchas gracias por responder. Lamentamos que no puedan acompañarnos.');
+          return;
+        }
+
+        mostrarMensaje('¡Gracias por confirmar! A continuación tienes tus pases individuales (En caso de llegar en diferente horario al evento)');
+
+        listaPases.className = 'lista-pases visible';
+        listaPases.innerHTML = '';
+
+        confirmados.forEach((persona, index) => {
+          const divPase = document.createElement('div');
+          divPase.className = 'tarjeta-pase-individual';
+          divPase.innerHTML = `
+            <div id="contenidoPase_${index}" class="contenido-pase">
+              <div class="pase-adorno">✦</div>
+              <div class="pase-titulo">Pase de Entrada</div>
+              <div class="pase-linea"></div>
+              <div class="pase-nombre">${escapar(persona.nombre)}</div>
+              <div class="pase-indicador">ACCESO INDIVIDUAL PERSONAL</div>
+              <div class="pase-intransferible">
+                Este pase es intransferible, únicamente está destinado para uso de las personas invitadas al evento.
+              </div>
+            </div>
+            <button type="button" class="boton-descargar" onclick="descargarPaseIndividual(${index}, '${escapar(persona.nombre)}', event)">
+              Descargar Pase de ${escapar(persona.nombre)}
+            </button>
+          `;
+          listaPases.appendChild(divPase);
+        });
+
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje('Hubo un error al guardar la información. Inténtalo de nuevo.');
+        boton.disabled = false;
+        boton.textContent = 'Confirmar respuestas';
+      }
+    }
+
+    function mostrarMensaje(texto) {
+      const mensaje = document.getElementById('mensaje');
+      mensaje.className = 'mensaje-rsvp visible';
+      mensaje.textContent = texto;
+    }
+
+    async function descargarPaseIndividual(index, nombrePersona, ev) {
+      const contenido = document.getElementById('contenidoPase_' + index);
+      if (!contenido) return;
+
+      const btn = ev.target;
+      const textoOriginal = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Generando imagen...';
+
+      try {
+        const canvas = await html2canvas(contenido, {
+          scale: 3,
+          backgroundColor: '#ffffff',
+          useCORS: true,
+          logging: false
+        });
+
+        canvas.toBlob(function(blob) {
+          if (!blob) throw new Error('Error al generar la imagen');
+          const url = URL.createObjectURL(blob);
+          const enlace = document.createElement('a');
+          enlace.href = url;
+          enlace.download = 'Pase-' + nombrePersona.replace(/[^a-zA-Z0-9]/g, '-') + '.png';
+          document.body.appendChild(enlace);
+          enlace.click();
+          document.body.removeChild(enlace);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }, 'image/png');
+
+      } catch (error) {
+        alert('No se pudo descargar automáticamente. Puedes tomarle captura de pantalla.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+      }
+    }
+
+    function escapar(texto) {
+      return String(texto).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+    }
+</script>
+
+</body>
+</html>
